@@ -4,3 +4,4 @@ pyttsx3
 python-dotenv
 faster-whisper
 openai
+pygame
