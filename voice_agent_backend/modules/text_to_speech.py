@@ -41,6 +41,22 @@ def synthesize_speech(text: str, voice_settings: Dict[str, Any]) -> StreamingRes
         io.BytesIO(web_audio),
         media_type="audio/wav"
     )
+    
+    # # For testing, create a simple WAV file
+    # # This is a minimal valid WAV file with no actual audio data
+    # print(f"[TEST] Synthesizing speech for text: {text}")
+    # print(f"[TEST] Using voice settings: {voice_settings}")
+    # 
+    # wav_header = (
+    #     b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00"
+    #     b"\x44\xac\x00\x00\x88\x58\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00"
+    # )
+    # 
+    # # Create a streaming response
+    # return StreamingResponse(
+    #     io.BytesIO(wav_header),
+    #     media_type="audio/wav"
+    # )
 
 
 def apply_voice_characteristics(audio_data: bytes, characteristics: Dict[str, Any]) -> bytes:

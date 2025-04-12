@@ -45,7 +45,7 @@ def generate_persona(preferences: Dict[str, Any]) -> Dict[str, Any]:
         "name": "AI Assistant",
         "personality": {
             "traits": preferences.get("personality_traits", []),
-            "speaking_style": "conversational",
+            "speaking_style": preferences.get("speaking_style", "conversational"),
             "tone": "friendly"
         },
         "knowledge": {
@@ -53,13 +53,15 @@ def generate_persona(preferences: Dict[str, Any]) -> Dict[str, Any]:
             "depth": "intermediate"
         },
         "voice_settings": {
-            "voice_id": "default",
+            "voice_id": preferences.get("voice_type", "default"),
             "speed": 1.0,
             "pitch": 1.0
         },
         "system_prompt": format_persona_prompt(preferences)
     }
     
+    # print(f"[TEST] Generating persona with preferences: {preferences}")
+    # print(f"[TEST] Generated persona: {persona}")
     return persona
 
 

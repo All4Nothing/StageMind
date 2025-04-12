@@ -44,6 +44,17 @@ async def transcribe_audio(audio_file: UploadFile) -> str:
         # Clean up the temporary file
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+    
+    # # For testing purposes, we still need to read the file to maintain async compatibility
+    # # This ensures we properly handle the async nature of the function
+    # try:
+    #     # Just read the file to maintain async compatibility
+    #     await audio_file.read()
+    #     print("[TEST] Transcribing audio - returning test transcription")
+    #     return "This is a test transcription from the user's audio."
+    # except Exception as e:
+    #     print(f"[TEST] Error reading audio file: {str(e)}")
+    #     return "Error transcribing audio, but continuing with test response."
 
 
 def preprocess_audio(audio_path: str) -> bytes:

@@ -31,6 +31,22 @@ def generate_response(user_input: str, persona: Dict[str, Any], chat_history: Li
     processed_response = post_process_response(raw_response)
     
     return processed_response
+    
+    # # For testing purposes, return a fixed response that includes the user input and persona traits
+    # print(f"[TEST] Generating response for input: {user_input}")
+    # 
+    # # Extract personality traits from persona
+    # traits = persona.get("personality", {}).get("traits", [])
+    # traits_str = ", ".join(traits) if traits else "friendly AI assistant"
+    # 
+    # # Generate a more detailed test response
+    # response = f"This is a test response to your input: '{user_input}'. I am your AI assistant with traits: {traits_str}."
+    # 
+    # # Add some context based on chat history length
+    # if chat_history:
+    #     response += f" We've had {len(chat_history)} exchanges so far."
+    # 
+    # return response
 
 
 def format_prompt(user_input: str, persona: Dict[str, Any], chat_history: List[Dict[str, str]]) -> str:
