@@ -179,7 +179,11 @@ export default function CallPage() {
                 <Link href="/">
                   <Button className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2">New Simulation</Button>
                 </Link>
-                <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2">Save Feedback</Button>
+                <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2"
+                 onClick={() => window.print()}
+                >
+                  Save Feedback
+                </Button>
               </div>
             </div>
           </div>

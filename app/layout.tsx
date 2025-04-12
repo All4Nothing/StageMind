@@ -20,6 +20,10 @@ export default function RootLayout({
 
   return (
     <html lang="en" data-theme={theme} style={{ colorScheme: theme }}>
+      <head>
+        <link rel="icon" href="/logo.png" />
+        <title>My App</title>
+      </head>
       <body>{children}</body>
     </html>
   )
