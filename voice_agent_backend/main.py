@@ -71,11 +71,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
             
             # Record audio and process
             audio_path = record_audio_chunk(max_duration=10, silence_duration=2.0)
-<<<<<<< HEAD
-            user_input = transcribe_audio(audio_path)
-=======
             user_input, arousal, dominance = transcribe_audio(audio_path)
->>>>>>> 8390e22 (feat sentiment analysis)
             
             if user_input:
                 # Send transcription to client
