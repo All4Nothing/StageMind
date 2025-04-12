@@ -43,14 +43,14 @@ async def websocket_chat_endpoint(websocket: WebSocket):
         knowledge = config.get("knowledge", "")
         
         # Initialize conversation context
+        VOICE_MAP = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
         routing_prompt = "You're a router.:\n"
-        for agent in AGENTS:
+        for idx, agent in enumerate(AGENTS):
             agent_name = agent["name"]
             agent_role = agent["role"]
             agent_description = agent["description"]
+            agent["voice"] = VOICE_MAP[idx]
             routing_prompt += f"- {agent_name}({agent_role}): {agent_description}\n"
-
-            agent["voice"] = "ash"
         
         conversation_log = []
         
@@ -71,14 +71,18 @@ async def websocket_chat_endpoint(websocket: WebSocket):
             
             # Record audio and process
             audio_path = record_audio_chunk(max_duration=10, silence_duration=2.0)
+<<<<<<< HEAD
             user_input = transcribe_audio(audio_path)
+=======
+            user_input, arousal, dominance = transcribe_audio(audio_path)
+>>>>>>> 8390e22 (feat sentiment analysis)
             
             if user_input:
                 # Send transcription to client
                 await websocket.send_json({"status": "transcription", "text": user_input})
                 
                 # Add to conversation log
-                conversation_log.append({"speaker": "User", "text": user_input})
+                conversation_log.append({"speaker": "User", "text": user_input, "arousal": arousal, "dominance": dominance})
                 
                 # Update routing prompt
                 current_routing_prompt = routing_prompt + f"User said: {user_input}\nRespond with ONLY one name: {', '.join([a['name'] for a in AGENTS])}."
@@ -92,6 +96,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                     "status": "processed",
                     "message": "Response processed"
                 })
+            print(f"conversation log: {conversation_log}")
     
     except WebSocketDisconnect:
         print("Client disconnected")

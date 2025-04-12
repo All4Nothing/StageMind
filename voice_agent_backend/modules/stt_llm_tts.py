@@ -33,19 +33,3 @@ async def run_real_time_transcriber(scenario, AGENTS, knowledge):
         print("\n👋 Exiting...")
         print(f"conversation log: {conversation_log}")  
         
-'''async def test():
-    agent_name = "MentorBot"
-    agent = next((a for a in AGENTS if a["name"].lower() == agent_name.lower()), AGENTS[0])
-    text = "Hello, my name is yongjoo kim"
-    conversation_log.append({"speaker": "User", "text": text})
-    prompt = (
-        f"User said: \"{text}\"\n"
-        "Reply in a natural, short, and conversational tone. Keep it to 1–2 sentences."
-    )
-    responses = []
-    await chat_with_agent(agent, prompt, responses, log=conversation_log)
-    print(f"conversation log: {conversation_log}")  '''
-        
-'''if __name__ == "__main__":
-    # asyncio.run(test())
-    run_real_time_transcriber()'''
