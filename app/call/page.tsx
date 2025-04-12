@@ -12,6 +12,10 @@ export default function CallPage() {
   const [callEnded, setCallEnded] = useState(false)
   const [micOn, setMicOn] = useState(true)
   const [videoOn, setVideoOn] = useState(true)
+  const [socketConnected, setSocketConnected] = useState(false)
+  const [transcript, setTranscript] = useState<string>('')
+  const [messages, setMessages] = useState<Array<{speaker: string, text: string}>>([])  
+  const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
   const [scenarioData, setScenarioData] = useState<{
     scenario: string;
     participants: Array<{
@@ -32,11 +36,69 @@ export default function CallPage() {
         const decodedData = JSON.parse(decodeURIComponent(scenarioParam))
         console.log('Received scenario data:', decodedData)
         setScenarioData(decodedData)
+        
+        // Initialize WebSocket connection after getting scenario data
+        if (decodedData && !webSocket) {
+          initializeWebSocket(decodedData)
+        }
       } catch (error) {
         console.error('Error parsing scenario data:', error)
       }
     }
-  }, [searchParams])
+    
+    // Cleanup function to close WebSocket when component unmounts
+    return () => {
+      if (webSocket) {
+        webSocket.close()
+      }
+    }
+  }, [searchParams, webSocket])
+  
+  const initializeWebSocket = (data: any) => {
+    // Create WebSocket connection
+    const ws = new WebSocket('ws://localhost:8000/ws/chat')
+    
+    ws.onopen = () => {
+      console.log('WebSocket connection established')
+      setSocketConnected(true)
+      
+      // Send initial configuration to the server
+      const config = {
+        scenario: data.scenario,
+        AGENTS: data.participants,
+        knowledge: ''
+      }
+      ws.send(JSON.stringify(config))
+    }
+    
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data)
+      console.log('Received message from server:', message)
+      
+      if (message.status === 'transcription') {
+        setTranscript(message.text)
+        setMessages(prev => [...prev, {speaker: 'You', text: message.text}])
+      } else if (message.status === 'response') {
+        // Handle agent response
+        if (message.agent && message.text) {
+          setMessages(prev => [...prev, {speaker: message.agent, text: message.text}])
+        }
+      } else if (message.status === 'error') {
+        console.error('Error from server:', message.message)
+      }
+    }
+    
+    ws.onclose = () => {
+      console.log('WebSocket connection closed')
+      setSocketConnected(false)
+    }
+    
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error)
+    }
+    
+    setWebSocket(ws)
+  }
 
   const handleEndCall = () => {
     const mediaTracks = ['video', 'audio']
@@ -48,6 +110,16 @@ export default function CallPage() {
         console.warn(`Could not stop ${type} stream:`, err)
       }
     })
+    
+    // Send hang-up signal to the server
+    if (webSocket && socketConnected) {
+      webSocket.send(JSON.stringify({ action: 'hang_up' }))
+    }
+    
+    // Close WebSocket connection
+    if (webSocket) {
+      webSocket.close()
+    }
   
     setCallEnded(true)
   }
@@ -75,6 +147,24 @@ export default function CallPage() {
                 <div className="absolute -top-10 -left-10 w-64 h-64 rounded-full bg-teal-500/10 blur-3xl"></div>
                 <div className="absolute top-1/3 -right-20 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl"></div>
                 <div className="absolute -bottom-20 left-1/3 w-72 h-72 rounded-full bg-blue-500/10 blur-3xl"></div>
+              </div>
+              
+              {/* Transcription display */}
+              <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700 max-w-5xl mx-auto">
+                <h3 className="text-gray-300 text-sm mb-2">Current Transcription:</h3>
+                <p className="text-white">{transcript || 'Listening...'}</p>
+              </div>
+              
+              {/* Conversation history */}
+              <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700 max-w-5xl mx-auto overflow-y-auto max-h-40">
+                <h3 className="text-gray-300 text-sm mb-2">Conversation:</h3>
+                {messages.map((msg, index) => (
+                  <div key={index} className="mb-2">
+                    <span className="font-medium text-teal-400">{msg.speaker}: </span>
+                    <span className="text-white">{msg.text}</span>
+                  </div>
+                ))}
+                {messages.length === 0 && <p className="text-gray-400 italic">The conversation will appear here...</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4 max-w-5xl mx-auto relative z-10">
@@ -138,29 +228,43 @@ export default function CallPage() {
               <Button
                 className={`rounded-full p-4 ${micOn ? "bg-gray-700 hover:bg-gray-600" : "bg-red-500/70 hover:bg-red-600/70"}`}
                 onClick={() => setMicOn(!micOn)}
+                disabled={!socketConnected}
               >
                 {micOn ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
               </Button>
               <Button
                 className={`rounded-full p-4 ${videoOn ? "bg-gray-700 hover:bg-gray-600" : "bg-red-500/70 hover:bg-red-600/70"}`}
                 onClick={() => setVideoOn(!videoOn)}
+                disabled={!socketConnected}
               >
                 {videoOn ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
               </Button>
-              <Button className="rounded-full p-4 bg-gray-700 hover:bg-gray-600">
+              <Button 
+                className="rounded-full p-4 bg-gray-700 hover:bg-gray-600"
+                disabled={!socketConnected}
+              >
                 <Monitor className="h-6 w-6" />
               </Button>
-              <Button className="rounded-full p-4 bg-gray-700 hover:bg-gray-600">
+              <Button 
+                className="rounded-full p-4 bg-gray-700 hover:bg-gray-600"
+                disabled={!socketConnected}
+              >
                 <Smile className="h-6 w-6" />
               </Button>
-              <Button className="rounded-full p-4 bg-gray-700 hover:bg-gray-600">
+              <Button 
+                className="rounded-full p-4 bg-gray-700 hover:bg-gray-600"
+                disabled={!socketConnected}
+              >
                 <MessageSquare className="h-6 w-6" />
               </Button>
-              <Button className="rounded-full p-4 bg-gray-700 hover:bg-gray-600">
+              <Button 
+                className="rounded-full p-4 bg-gray-700 hover:bg-gray-600"
+                disabled={!socketConnected}
+              >
                 <Settings className="h-6 w-6" />
               </Button>
               <Button className="rounded-full px-6 py-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleEndCall}>
-                Leave
+                {socketConnected ? "Hang Up" : "Leave"}
               </Button>
             </div>
           </>

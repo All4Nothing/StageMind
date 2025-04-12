@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from faster_whisper import WhisperModel
 from openai import OpenAI
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path="/Users/elice53/StageMind/.env")
+# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path="/Users/jason/StageMind/.env.local")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

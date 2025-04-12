@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # import pyttsx3
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path="/Users/elice53/StageMind/.env")
+load_dotenv(dotenv_path="/Users/jason/StageMind/.env.local")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

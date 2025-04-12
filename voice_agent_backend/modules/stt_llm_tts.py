@@ -1,9 +1,9 @@
 import asyncio
 
-from record_audio import record_audio_chunk
-from create_agent_response import chat_with_agent
-from speech_to_text import transcribe_audio
-from handles_conversation import handle_conversation
+from .record_audio import record_audio_chunk
+from .create_agent_response import chat_with_agent
+from .speech_to_text import transcribe_audio
+from .handles_conversation import handle_conversation
 
 '''AGENTS = [
     {"name": "MentorBot", "role": "wise mentor", "description": "You are a wise mentor.", "voice": "nova"},
@@ -11,8 +11,9 @@ from handles_conversation import handle_conversation
     {"name": "CritiqueBot", "role": "critical and analytical", "description": "You are critical and analytical.", "voice": "ash"},
 ]'''
             
-def run_real_time_transcriber(scenario, AGENTS, knowledge):
+async def run_real_time_transcriber(scenario, AGENTS, knowledge):
     routing_prompt = "You're a router.:\n"
+
     for agent in AGENTS:
         agent_name = agent["name"]
         agent_role = agent["role"]
@@ -27,7 +28,7 @@ def run_real_time_transcriber(scenario, AGENTS, knowledge):
             conversation_log.append({"speaker": "User", "text": user_input})
             routing_prompt += f"User said: {user_input}\nRespond with ONLY one name: {', '.join([a['name'] for a in AGENTS])}."
             if user_input:
-                asyncio.run(handle_conversation(AGENTS, user_input, scenario, knowledge, conversation_log, routing_prompt))
+                await handle_conversation(AGENTS, user_input, scenario, knowledge, conversation_log, routing_prompt)
     except KeyboardInterrupt:
         print("\n👋 Exiting...")
         print(f"conversation log: {conversation_log}")  

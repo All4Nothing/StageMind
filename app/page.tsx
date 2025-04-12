@@ -23,6 +23,7 @@ export default function Home() {
       role: string;
       description: string;
     }>;
+    knowledge: string;
   } | null>(null);
 
   // Monitor changes to aiResponse
@@ -325,22 +326,20 @@ export default function Home() {
 
                   {/* Only show Begin button after text generation is complete and we have a response */}
                   {!isLoading && aiResponse && (
-                    <Link 
-                      href={{
-                        pathname: '/call',
-                        query: {
-                          scenario: encodeURIComponent(JSON.stringify({
-                            scenario: aiResponse.scenario,
-                            participants: aiResponse.participants,
-                            meetingLength: duration
-                          }))
-                        }
+                    <Button 
+                      className="w-full bg-teal-500 hover:bg-teal-600 text-white py-4 rounded-xl mt-4"
+                      onClick={() => {
+                        console.log('Navigating to call page with WebSocket support...');
+                        // Navigate directly to the call page - WebSocket connection will be established there
+                        window.location.href = `/call?scenario=${encodeURIComponent(JSON.stringify({
+                          scenario: aiResponse.scenario,
+                          participants: aiResponse.participants,
+                          meetingLength: duration
+                        }))}`;
                       }}
                     >
-                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white py-4 rounded-xl mt-4">
-                        Begin
-                      </Button>
-                    </Link>
+                      Begin
+                    </Button>
                   )}
                 </div>
               </>

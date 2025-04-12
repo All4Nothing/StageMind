@@ -2,11 +2,11 @@ import random
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
-from create_agent_response import chat_with_agent
-from text_to_speech import speak
+from .create_agent_response import chat_with_agent
+from .text_to_speech import speak
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path="/Users/elice53/StageMind/.env")
+load_dotenv(dotenv_path="/Users/jason/StageMind/.env.local")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
