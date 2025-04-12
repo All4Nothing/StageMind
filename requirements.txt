@@ -5,3 +5,9 @@ python-dotenv
 faster-whisper
 openai
 pygame
+fastapi
+uvicorn[standard]
+torch
+torchaudio
+transformers
+webrtcvad
