@@ -23,8 +23,8 @@ def send_to_perplexity(messages, max_tokens=1000):
     You received background info about a user, AI experts, knowledge base, and the chat history between them.
     Through the conversation analyze and convert to percentage communication, technical knowledge, and problem solving skills only of the user.
     Output ONLY a JSON object for an api response containing the following fields:
-    communication (only in percentage number), technical knowledge (only in percentage number), problem solving(only in percentage number), strengths, weaknesses,
-    suggestion_expert_1, suggestion_expert_2, suggestion_expert_3
+    communication (only in percentage number), technical knowledge (only in percentage number), problem solving(only in percentage number), strengths (give a few sentences), weaknesses(give a few sentences),
+    suggestion_expert_1, suggestion_expert_2,...
     {messages}
     """
 
@@ -63,6 +63,7 @@ def read_root():
 @app.get("/analyze")
 def analyze():
     full_text = """
+    User info:
     User is a university student learning AI ethics. Their goal is to improve persuasive communication.
 
     Experts:
