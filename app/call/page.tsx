@@ -17,6 +17,8 @@ export default function CallPage() {
   const [messages, setMessages] = useState<Array<{speaker: string, text: string}>>([])  
   const [conversationLog, setConversationLog] = useState<Array<{speaker: string, text: string}>>([])  
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
+  const [analysisResult, setAnalysisResult] = useState<any>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [scenarioData, setScenarioData] = useState<{
     scenario: string;
     participants: Array<{
@@ -129,10 +131,14 @@ export default function CallPage() {
       webSocket.close()
     }
     
+    // First set callEnded to true to end the call UI
+    // and set isAnalyzing to true to show the loading state
+    setCallEnded(true)
+    setIsAnalyzing(true)
+    
     // Send data to the analyze endpoint
     if (scenarioData) {
       try {
-        // Include conversation log in the data sent for analysis
         console.log('Sending data to analyze endpoint...')
         const response = await fetch('http://localhost:8000/analyze', {
           method: 'POST',
@@ -143,24 +149,30 @@ export default function CallPage() {
             scenario: scenarioData.scenario,
             AGENTS: scenarioData.participants,
             knowledge: scenarioData.knowledge || '',
-            conversation_log: conversationLog
+            conversation: conversationLog // Changed from conversation_log to conversation to match backend
           }),
         })
         
         if (response.ok) {
           const analysisResult = await response.json()
           console.log('Analysis result:', analysisResult)
-          // Store analysis result in state if needed
-          // setAnalysisResult(analysisResult)
+          // Store analysis result in state
+          setAnalysisResult(analysisResult)
+          // Set analyzing state to false after we have the result
+          setIsAnalyzing(false)
         } else {
           console.error('Failed to get analysis:', response.statusText)
+          setIsAnalyzing(false)
         }
       } catch (error) {
         console.error('Error sending data to analyze endpoint:', error)
+        // Set analyzing state to false if there's an error
+        setIsAnalyzing(false)
       }
+    } else {
+      // If there's no scenario data, just set analyzing to false
+      setIsAnalyzing(false)
     }
-  
-    setCallEnded(true)
   }
   
   return (
@@ -303,11 +315,25 @@ export default function CallPage() {
                 <Settings className="h-6 w-6" />
               </Button>
               <Button className="rounded-full px-6 py-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleEndCall}>
-                {socketConnected ? "Hang Up" : "Leave"}
+                Hang Up
               </Button>
             </div>
           </>
-        ) : (
+        ) : isAnalyzing ? (
+          <div className="flex-grow flex flex-col items-center justify-center p-6">
+            <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700 max-w-3xl w-full text-center">
+              <h2 className="text-2xl font-bold text-white mb-6">Analyzing Your Performance</h2>
+              <div className="flex justify-center mb-6">
+                <svg className="animate-spin h-10 w-10 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <p className="text-gray-300 mb-2">Please wait while we analyze your conversation and generate personalized feedback.</p>
+              <p className="text-gray-400 text-sm">This may take a few moments...</p>
+            </div>
+          </div>
+        ) : analysisResult ? (
           <div className="flex-grow flex flex-col items-center justify-center p-6">
             <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700 max-w-3xl w-full">
               <h2 className="text-2xl font-bold text-white mb-6 text-center">Simulation Feedback</h2>
@@ -318,16 +344,20 @@ export default function CallPage() {
                   <div className="flex-1 bg-gray-700 h-4 rounded-full overflow-hidden">
                     <div
                       className="bg-gradient-to-r from-teal-400 to-cyan-300 h-full rounded-full"
-                      style={{ width: "78%" }}
+                      style={{ width: `${analysisResult ? 
+                        Math.round((analysisResult.communication + analysisResult.technical_knowledge + analysisResult.problem_solving) / 3) : 78}%` }}
                     ></div>
                   </div>
-                  <span className="text-2xl font-bold text-white ml-4">78%</span>
+                  <span className="text-2xl font-bold text-white ml-4">
+                    {analysisResult ? 
+                      Math.round((analysisResult.communication + analysisResult.technical_knowledge + analysisResult.problem_solving) / 3) : 78}%
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <ScoreCard title="Communication" score={82} />
-                  <ScoreCard title="Technical Knowledge" score={75} />
-                  <ScoreCard title="Problem Solving" score={79} />
+                  <ScoreCard title="Communication" score={analysisResult?.communication || 82} />
+                  <ScoreCard title="Technical Knowledge" score={analysisResult?.technical_knowledge || 75} />
+                  <ScoreCard title="Problem Solving" score={analysisResult?.problem_solving || 79} />
                 </div>
               </div>
 
@@ -335,14 +365,10 @@ export default function CallPage() {
                 <h3 className="text-xl font-semibold text-white mb-4">Feedback Summary</h3>
                 <div className="bg-gray-900/70 p-4 rounded-lg border border-gray-700 mb-4">
                   <p className="text-gray-300 mb-2">
-                    <span className="font-semibold text-teal-400">Strengths:</span> You demonstrated strong
-                    communication skills and provided clear examples from your past experience. Your answers were
-                    well-structured and concise.
+                    <span className="font-semibold text-teal-400">Strengths:</span> {analysisResult?.strengths || "You demonstrated strong communication skills and provided clear examples from your past experience. Your answers were well-structured and concise."}
                   </p>
                   <p className="text-gray-300">
-                    <span className="font-semibold text-teal-400">Areas for improvement:</span> Consider providing more
-                    specific technical details when answering questions about your skills. Practice explaining complex
-                    concepts in simpler terms.
+                    <span className="font-semibold text-teal-400">Areas for improvement:</span> {analysisResult?.weaknesses || "Consider providing more specific technical details when answering questions about your skills. Practice explaining complex concepts in simpler terms."}
                   </p>
                 </div>
               </div>
@@ -362,15 +388,16 @@ export default function CallPage() {
                       ];
                       const imageSrcs = ["/interviewer.png", "/womaninterviewer.png", "/boss.png"];
                       
-                      // Generate generic feedback based on role
-                      const genericFeedback = `Your interaction with ${participant.name} as the ${participant.role} was good. ${participant.description} Consider preparing more specific examples related to this role for future simulations.`;
+                      // Use suggestion from the analysis result for this participant
+                      const expertSuggestion = analysisResult[`suggestion_expert_${index + 1}`];
+                      const feedbackContent = expertSuggestion || `Your interaction with ${participant.name} as the ${participant.role} was good. ${participant.description} Consider preparing more specific examples related to this role for future simulations.`;
                       
                       return (
                         <FeedbackCard
                           key={index}
                           name={participant.name}
                           role={participant.role}
-                          feedback={genericFeedback}
+                          feedback={feedbackContent}
                           avatarColor={avatarColors[index % avatarColors.length]}
                           imageSrc={imageSrcs[index % imageSrcs.length]}
                         />
@@ -414,6 +441,18 @@ export default function CallPage() {
                 >
                   Save Feedback
                 </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-grow flex flex-col items-center justify-center p-6">
+            <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700 max-w-3xl w-full text-center">
+              <h2 className="text-2xl font-bold text-white mb-6">Call Ended</h2>
+              <p className="text-gray-300 mb-6">Your call has ended, but we couldn't generate a report.</p>
+              <div className="flex justify-center gap-4">
+                <Link href="/">
+                  <Button className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2">Return Home</Button>
+                </Link>
               </div>
             </div>
           </div>
