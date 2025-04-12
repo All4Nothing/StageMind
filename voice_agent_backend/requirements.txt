@@ -1,0 +1,10 @@
+fastapi==0.104.1
+uvicorn==0.23.2
+python-multipart==0.0.6
+pydantic==2.4.2
+python-dotenv==1.0.0
+# For audio processing (adjust based on your STT/TTS implementation)
+# librosa==0.10.1
+# For LLM integration (adjust based on your chosen LLM)
+# openai==1.2.0
+# langchain==0.0.335
