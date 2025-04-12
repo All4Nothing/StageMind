@@ -15,6 +15,7 @@ export default function CallPage() {
   const [socketConnected, setSocketConnected] = useState(false)
   const [transcript, setTranscript] = useState<string>('')
   const [messages, setMessages] = useState<Array<{speaker: string, text: string}>>([])  
+  const [conversationLog, setConversationLog] = useState<Array<{speaker: string, text: string}>>([])  
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
   const [scenarioData, setScenarioData] = useState<{
     scenario: string;
@@ -84,6 +85,12 @@ export default function CallPage() {
         if (message.agent && message.text) {
           setMessages(prev => [...prev, {speaker: message.agent, text: message.text}])
         }
+      } else if (message.status === 'conversation_log_update') {
+        // Handle conversation log update
+        if (message.conversation_log) {
+          setConversationLog(message.conversation_log)
+          console.log('Updated conversation log:', message.conversation_log)
+        }
       } else if (message.status === 'error') {
         console.error('Error from server:', message.message)
       }
@@ -125,6 +132,7 @@ export default function CallPage() {
     // Send data to the analyze endpoint
     if (scenarioData) {
       try {
+        // Include conversation log in the data sent for analysis
         console.log('Sending data to analyze endpoint...')
         const response = await fetch('http://localhost:8000/analyze', {
           method: 'POST',
@@ -135,7 +143,7 @@ export default function CallPage() {
             scenario: scenarioData.scenario,
             AGENTS: scenarioData.participants,
             knowledge: scenarioData.knowledge || '',
-            conversation: messages
+            conversation_log: conversationLog
           }),
         })
         

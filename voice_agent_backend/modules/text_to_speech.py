@@ -3,6 +3,7 @@ import os
 import tempfile
 import pygame
 from dotenv import load_dotenv
+import json
 
 # import pyttsx3
 
@@ -10,6 +11,13 @@ dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path="/Users/jason/StageMind/.env.local")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Store WebSocket reference
+websocket = None
+
+def set_websocket(ws):
+    global websocket
+    websocket = ws
 
 VOICE_MAP = {
     "alloy": "부드럽고 진중한 남성형",
@@ -21,7 +29,7 @@ VOICE_MAP = {
 }
 def speak(text, voice="nova"):
     if not text.strip():
-        return
+        return {}
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
             response = client.audio.speech.create(
@@ -36,8 +44,25 @@ def speak(text, voice="nova"):
         pygame.mixer.music.play()
         while pygame.mixer.music.get_busy():
             pygame.time.Clock().tick(10)
+            
+        # Create response data
+        response_data = {
+            "status": "response",
+            "agent": voice,  # This should ideally be the agent name, not the voice
+            "text": text
+        }
+            
+        # Send response to frontend if WebSocket is available
+        if websocket:
+            try:
+                websocket.send_json(response_data)
+            except Exception as e:
+                print(f":x: WebSocket error: {e}")
+                
+        return response_data
     except Exception as e:
         print(f":x: OpenAI TTS error: {e}")
+        return {"status": "error", "message": str(e)}
 
 '''
 tts_engine = pyttsx3.init()

@@ -8,6 +8,7 @@ from modules.record_audio import record_audio_chunk
 from modules.speech_to_text import transcribe_audio
 from modules.handles_conversation import handle_conversation
 from modules.evaluation import send_to_perplexity
+from modules.text_to_speech import set_websocket
 from fastapi.responses import JSONResponse
 
 # Initialize FastAPI app
@@ -32,6 +33,9 @@ class ChatRequest(BaseModel):
 @app.websocket("/ws/chat")
 async def websocket_chat_endpoint(websocket: WebSocket):
     await websocket.accept()
+    
+    # Set the WebSocket reference in the text_to_speech module
+    set_websocket(websocket)
     
     try:
         # Receive initial configuration
@@ -70,7 +74,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 pass
             
             # Record audio and process
-            audio_path = record_audio_chunk(max_duration=10, silence_duration=2.0)
+            audio_path = record_audio_chunk(duration=10)
             user_input = transcribe_audio(audio_path)
             
             if user_input:
@@ -80,6 +84,12 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 # Add to conversation log
                 conversation_log.append({"speaker": "User", "text": user_input})
                 
+                # Send updated conversation log to frontend
+                await websocket.send_json({
+                    "status": "conversation_log_update",
+                    "conversation_log": conversation_log
+                })
+                
                 # Update routing prompt
                 current_routing_prompt = routing_prompt + f"User said: {user_input}\nRespond with ONLY one name: {', '.join([a['name'] for a in AGENTS])}."
                 
@@ -87,10 +97,11 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 await handle_conversation(AGENTS, user_input, scenario, knowledge, conversation_log, current_routing_prompt)
                 
                 # The response is handled inside handle_conversation which calls speak()
-                # We can send a confirmation to the client
+                # Send updated conversation log again after processing response
                 await websocket.send_json({
                     "status": "processed",
-                    "message": "Response processed"
+                    "message": "Response processed",
+                    "conversation_log": conversation_log
                 })
     
     except WebSocketDisconnect:

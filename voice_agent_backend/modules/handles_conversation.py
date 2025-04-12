@@ -48,7 +48,17 @@ async def handle_conversation(AGENTS, text, scenario, knowledge, log=None, routi
     for name, reply, voice in responses:
         # event
         # send agent name to fe
-        speak(reply, voice) # -> json
+        response_data = speak(reply, voice) # -> json
+        
+        # Add WebSocket reference to function parameters to send conversation log updates
+        if hasattr(speak, 'websocket') and speak.websocket:
+            try:
+                await speak.websocket.send_json({
+                    "status": "conversation_log_update",
+                    "conversation_log": log
+                })
+            except Exception as e:
+                print(f"❌ Error sending conversation log update: {e}")
 
     '''# Step 3: Optional brief reactions from 0–2 others
     other_agents = [a for a in AGENTS if a["name"] != main_agent["name"]]
