@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -15,8 +15,101 @@ export default function Home() {
   const [duration, setDuration] = useState(15)
   const [scenarioText, setScenarioText] = useState("")
 
-  const handleGenerate = () => {
-    setShowOverview(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [aiResponse, setAiResponse] = useState<{
+    scenario: string;
+    participants: Array<{
+      name: string;
+      role: string;
+      description: string;
+    }>;
+  } | null>(null);
+
+  // Monitor changes to aiResponse
+  useEffect(() => {
+    console.log('aiResponse state updated:', aiResponse);
+  }, [aiResponse]);
+
+  const handleGenerate = async () => {
+    setIsLoading(true)
+    setShowOverview(true) // Set showOverview to true immediately to show loading state
+    console.log('Starting API call to Perplexity...');
+    try {
+      // Prepare the simplified request body with only the necessary fields
+      const requestBody = {
+        scenarioText,
+        participants,
+        meetingLength: duration
+      };
+
+      console.log('Request body:', requestBody);
+
+      // Call our API route
+      const response = await fetch('/api/perplexity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('API response data:', data);
+      
+      // Log each key of the response separately
+      console.log('Response keys:', Object.keys(data));
+      for (const key of Object.keys(data)) {
+        console.log(`Response key [${key}]:`, data[key]);
+      }
+      
+      if (data.choices && data.choices.length > 0) {
+        try {
+          // Parse the JSON response
+          const responseContent = data.choices[0].message.content;
+          console.log('Setting AI response:', responseContent);
+          
+          // Log the message object structure
+          console.log('Message object:', data.choices[0].message);
+          
+          // If message has additional properties, log them
+          if (data.choices[0].message) {
+            console.log('Message keys:', Object.keys(data.choices[0].message));
+            for (const key of Object.keys(data.choices[0].message)) {
+              console.log(`Message key [${key}]:`, data.choices[0].message[key]);
+            }
+          }
+          
+          // If it's a string, try to parse it as JSON
+          const parsedResponse = typeof responseContent === 'string' 
+            ? JSON.parse(responseContent) 
+            : responseContent;
+          
+          // Log the parsed response structure
+          console.log('Parsed response keys:', Object.keys(parsedResponse));
+          for (const key of Object.keys(parsedResponse)) {
+            console.log(`Parsed response key [${key}]:`, parsedResponse[key]);
+          }
+            
+          setAiResponse(parsedResponse);
+        } catch (parseError) {
+          console.error('Error parsing AI response:', parseError);
+          setAiResponse(null);
+        }
+      } else {
+        console.warn('No choices found in the API response or empty choices array');
+        if (data.error) {
+          console.error('API error:', data.error);
+        }
+        setAiResponse(null);
+      }
+    } catch (error) {
+      console.error('Error generating content:', error);
+    } finally {
+      setIsLoading(false)
+      // Note: We already set showOverview to true at the beginning
+      // The useEffect above will show the updated value
+    }
   }
 
   interface Scenario {
@@ -175,35 +268,80 @@ export default function Home() {
               <>
                 <div className="mb-6">
                   <p className="text-gray-300">
-                    {scenarioText ||
-                      `This is a meeting simulation with ${participants} AI participants. The meeting will last approximately ${duration} minutes.`}
+                    {isLoading ? (
+                      <span className="flex items-center justify-center space-x-2">
+                        <svg className="animate-spin h-5 w-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Generating scenario...</span>
+                      </span>
+                    ) : aiResponse ? (
+                      aiResponse.scenario
+                    ) : (
+                      `This is a meeting simulation with ${participants} AI participants. The meeting will last approximately ${duration} minutes.`
+                    )}
                   </p>
                 </div>
 
                 <div className="space-y-3 mb-8">
-                  {Number.parseInt(participants) >= 1 && (
-                    <ParticipantCard
-                      name="Alex Chen"
-                      role="Technical Interviewer"
-                      description="Will ask technical questions."
-                    />
-                  )}
-                  {Number.parseInt(participants) >= 2 && (
-                    <ParticipantCard name="Sarah Johnson" role="HR Manager" description="Will ask about experience." />
-                  )}
-                  {Number.parseInt(participants) >= 3 && (
-                    <ParticipantCard
-                      name="Michael Rodriguez"
-                      role="Department Head"
-                      description="Will evaluate team fit."
-                    />
+                  {/* Only show participants when not loading and we have AI response */}
+                  {!isLoading && (
+                    aiResponse && aiResponse.participants ? (
+                      // Display AI-generated participants
+                      aiResponse.participants.map((participant, index) => (
+                        <ParticipantCard
+                          key={index}
+                          name={participant.name}
+                          role={participant.role}
+                          description={participant.description}
+                        />
+                      ))
+                    ) : (
+                      // Only show default participants when not loading
+                      !isLoading && (
+                        <>
+                          {Number.parseInt(participants) >= 1 && (
+                            <ParticipantCard
+                              name="Alex Chen"
+                              role="Technical Interviewer"
+                              description="Will ask technical questions."
+                            />
+                          )}
+                          {Number.parseInt(participants) >= 2 && (
+                            <ParticipantCard name="Sarah Johnson" role="HR Manager" description="Will ask about experience." />
+                          )}
+                          {Number.parseInt(participants) >= 3 && (
+                            <ParticipantCard
+                              name="Michael Rodriguez"
+                              role="Department Head"
+                              description="Will evaluate team fit."
+                            />
+                          )}
+                        </>
+                      )
+                    )
                   )}
 
-                  <Link href="/call">
-                    <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white py-4 rounded-xl mt-4">
-                      Begin
-                    </Button>
-                  </Link>
+                  {/* Only show Begin button after text generation is complete and we have a response */}
+                  {!isLoading && aiResponse && (
+                    <Link 
+                      href={{
+                        pathname: '/call',
+                        query: {
+                          scenario: encodeURIComponent(JSON.stringify({
+                            scenario: aiResponse.scenario,
+                            participants: aiResponse.participants,
+                            meetingLength: duration
+                          }))
+                        }
+                      }}
+                    >
+                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white py-4 rounded-xl mt-4">
+                        Begin
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </>
             ) : (

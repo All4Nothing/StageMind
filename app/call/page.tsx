@@ -1,16 +1,42 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Mic, MicOff, Video, VideoOff, Monitor, Smile, Settings, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeProvider } from "@/components/theme-provider"
 import Link from "next/link"
 import Image from "next/image"
 import CallParticipant from "@/components/call-participant"
+import { useSearchParams } from "next/navigation"
 
 export default function CallPage() {
   const [callEnded, setCallEnded] = useState(false)
   const [micOn, setMicOn] = useState(true)
   const [videoOn, setVideoOn] = useState(true)
+  const [scenarioData, setScenarioData] = useState<{
+    scenario: string;
+    participants: Array<{
+      name: string;
+      role: string;
+      description: string;
+    }>;
+    meetingLength: number;
+  } | null>(null)
+  
+  const searchParams = useSearchParams()
+  
+  useEffect(() => {
+    // Get scenario data from URL query parameters
+    const scenarioParam = searchParams.get('scenario')
+    if (scenarioParam) {
+      try {
+        const decodedData = JSON.parse(decodeURIComponent(scenarioParam))
+        console.log('Received scenario data:', decodedData)
+        setScenarioData(decodedData)
+      } catch (error) {
+        console.error('Error parsing scenario data:', error)
+      }
+    }
+  }, [searchParams])
 
   const handleEndCall = () => {
     const mediaTracks = ['video', 'audio']
@@ -35,10 +61,10 @@ export default function CallPage() {
             <div className="w-full bg-gray-900/80 backdrop-blur-sm p-3 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span className="text-white font-semibold">SimuMeet</span>
-                <span className="text-gray-400 text-sm">Job Interview Simulation</span>
+                <span className="text-gray-400 text-sm">{scenarioData ? 'Custom Scenario' : 'Job Interview Simulation'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-400 text-sm">Duration: 00:05:32</span>
+                <span className="text-gray-400 text-sm">Duration: {scenarioData ? `${scenarioData.meetingLength}:00` : '00:05:32'}</span>
               </div>
             </div>
 
@@ -53,27 +79,57 @@ export default function CallPage() {
 
               <div className="grid grid-cols-2 gap-4 max-w-5xl mx-auto relative z-10">
                 <CallParticipant name="You" isUser={true} bgColor="bg-gray-800" micOn={micOn} videoOn={videoOn} />
-                <CallParticipant
-                  name="Alex Chen"
-                  role="Technical Interviewer"
-                  bgColor="bg-teal-900/40"
-                  avatarColor="from-teal-400 to-cyan-300"
-                  imageSrc="/interviewer.png"
-                />
-                <CallParticipant
-                  name="Sarah Johnson"
-                  role="HR Manager"
-                  bgColor="bg-purple-900/40"
-                  avatarColor="from-purple-400 to-pink-300"
-                  imageSrc = "/womaninterviewer.png"
-                />
-                <CallParticipant
-                  name="Michael Rodriguez"
-                  role="Department Head"
-                  bgColor="bg-blue-900/40"
-                  avatarColor="from-blue-400 to-indigo-300"
-                  imageSrc="/boss.png"
-                />
+                
+                {scenarioData && scenarioData.participants ? (
+                  // Display the custom participants from the scenario data
+                  scenarioData.participants.map((participant, index) => {
+                    // Assign different background colors based on index
+                    const bgColors = ["bg-teal-900/40", "bg-purple-900/40", "bg-blue-900/40", "bg-amber-900/40"];
+                    const avatarColors = [
+                      "from-teal-400 to-cyan-300", 
+                      "from-purple-400 to-pink-300", 
+                      "from-blue-400 to-indigo-300",
+                      "from-amber-400 to-orange-300"
+                    ];
+                    const imageSrcs = ["/interviewer.png", "/womaninterviewer.png", "/boss.png"];
+                    
+                    return (
+                      <CallParticipant
+                        key={index}
+                        name={participant.name}
+                        role={participant.role}
+                        bgColor={bgColors[index % bgColors.length]}
+                        avatarColor={avatarColors[index % avatarColors.length]}
+                        imageSrc={imageSrcs[index % imageSrcs.length]}
+                      />
+                    );
+                  })
+                ) : (
+                  // Fallback to default participants
+                  <>
+                    <CallParticipant
+                      name="Alex Chen"
+                      role="Technical Interviewer"
+                      bgColor="bg-teal-900/40"
+                      avatarColor="from-teal-400 to-cyan-300"
+                      imageSrc="/interviewer.png"
+                    />
+                    <CallParticipant
+                      name="Sarah Johnson"
+                      role="HR Manager"
+                      bgColor="bg-purple-900/40"
+                      avatarColor="from-purple-400 to-pink-300"
+                      imageSrc="/womaninterviewer.png"
+                    />
+                    <CallParticipant
+                      name="Michael Rodriguez"
+                      role="Department Head"
+                      bgColor="bg-blue-900/40"
+                      avatarColor="from-blue-400 to-indigo-300"
+                      imageSrc="/boss.png"
+                    />
+                  </>
+                )}
               </div>
             </div>
 
@@ -151,27 +207,58 @@ export default function CallPage() {
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-white mb-4">Participant Feedback</h3>
                 <div className="space-y-4">
-                  <FeedbackCard
-                    name="Alex Chen"
-                    role="Technical Interviewer"
-                    feedback="Good technical foundation, but could elaborate more on implementation details. Consider preparing more specific examples of your technical problem-solving process."
-                    avatarColor="from-teal-400 to-cyan-300"
-                    imageSrc="/interviewer.png"
-                  />
-                  <FeedbackCard
-                    name="Sarah Johnson"
-                    role="HR Manager"
-                    feedback="Excellent communication skills and professional demeanor. Your responses about teamwork were particularly strong. Consider preparing more examples of handling workplace challenges."
-                    avatarColor="from-purple-400 to-pink-300"
-                    imageSrc = "/womaninterviewer.png"
-                  />
-                  <FeedbackCard
-                    name="Michael Rodriguez"
-                    role="Department Head"
-                    feedback="You demonstrated good cultural fit and understanding of the role. I'd recommend researching more about our company's recent projects to show deeper interest in our specific work."
-                    avatarColor="from-blue-400 to-indigo-300"
-                    imageSrc="/boss.png"
-                  />
+                  {scenarioData && scenarioData.participants ? (
+                    // Display feedback cards for custom participants
+                    scenarioData.participants.map((participant, index) => {
+                      // Assign different avatar colors and images based on index
+                      const avatarColors = [
+                        "from-teal-400 to-cyan-300", 
+                        "from-purple-400 to-pink-300", 
+                        "from-blue-400 to-indigo-300",
+                        "from-amber-400 to-orange-300"
+                      ];
+                      const imageSrcs = ["/interviewer.png", "/womaninterviewer.png", "/boss.png"];
+                      
+                      // Generate generic feedback based on role
+                      const genericFeedback = `Your interaction with ${participant.name} as the ${participant.role} was good. ${participant.description} Consider preparing more specific examples related to this role for future simulations.`;
+                      
+                      return (
+                        <FeedbackCard
+                          key={index}
+                          name={participant.name}
+                          role={participant.role}
+                          feedback={genericFeedback}
+                          avatarColor={avatarColors[index % avatarColors.length]}
+                          imageSrc={imageSrcs[index % imageSrcs.length]}
+                        />
+                      );
+                    })
+                  ) : (
+                    // Fallback to default feedback cards
+                    <>
+                      <FeedbackCard
+                        name="Alex Chen"
+                        role="Technical Interviewer"
+                        feedback="Good technical foundation, but could elaborate more on implementation details. Consider preparing more specific examples of your technical problem-solving process."
+                        avatarColor="from-teal-400 to-cyan-300"
+                        imageSrc="/interviewer.png"
+                      />
+                      <FeedbackCard
+                        name="Sarah Johnson"
+                        role="HR Manager"
+                        feedback="Excellent communication skills and professional demeanor. Your responses about teamwork were particularly strong. Consider preparing more examples of handling workplace challenges."
+                        avatarColor="from-purple-400 to-pink-300"
+                        imageSrc="/womaninterviewer.png"
+                      />
+                      <FeedbackCard
+                        name="Michael Rodriguez"
+                        role="Department Head"
+                        feedback="You demonstrated good cultural fit and understanding of the role. I'd recommend researching more about our company's recent projects to show deeper interest in our specific work."
+                        avatarColor="from-blue-400 to-indigo-300"
+                        imageSrc="/boss.png"
+                      />
+                    </>
+                  )}
                 </div>
               </div>
 
