@@ -61,7 +61,7 @@ export function Overview({
             </p>
           </div>
 
-          <div className="space-y-3 mb-8">
+          <div className="space-y-3 mb-8 max-h-96 overflow-y-auto pr-2">
             {!isLoading &&
               aiResponse &&
               aiResponse.participants.map((participant, index) => (

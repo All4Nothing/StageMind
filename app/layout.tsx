@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en" data-theme={theme} style={{ colorScheme: theme }}>
       <head>
         <link rel="icon" href="/logo.png" />
-        <title>My App</title>
+        <title>StageMind</title>
       </head>
       <body>{children}</body>
     </html>

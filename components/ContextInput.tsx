@@ -41,7 +41,6 @@ export function ContextInput({
             <option value="2">2 participants</option>
             <option value="3">3 participants</option>
             <option value="4">4 participants</option>
-            <option value="5">5 participants</option>
           </select>
         </div>
 
