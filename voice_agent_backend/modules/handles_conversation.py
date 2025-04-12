@@ -10,7 +10,7 @@ load_dotenv(dotenv_path="/Users/elice53/StageMind/.env")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-async def handle_conversation(AGENTS, text, log=None, routing_prompt=None):
+async def handle_conversation(AGENTS, text, scenario, knowledge, log=None, routing_prompt=None):
     print(f"\n🧠 You said: {text}")
     # Step 1: Choose the primary speaker using OpenAI
     '''routing_prompt = (
@@ -26,8 +26,8 @@ async def handle_conversation(AGENTS, text, log=None, routing_prompt=None):
         routing_response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a smart AI message router."},
-                {"role": "user", "content": routing_prompt}
+                {"role": "system", "content": f"You are a smart AI message router. {routing_prompt}"},
+                {"role": "user", "content": f"This is the conversation history so far: {log}. Based on the user's message, choose the most appropriate agent to respond."}
             ]
         )
         main_agent_name = routing_response.choices[0].message.content.strip()
@@ -41,8 +41,7 @@ async def handle_conversation(AGENTS, text, log=None, routing_prompt=None):
 
     # Step 2: Generate a short main reply
     main_prompt = (
-        f"User said: \"{text}\"\n"
-        "Reply in a natural, short, and conversational tone. Keep it to 1–2 sentences."
+        f"The conversation scenario is {scenario}. User said: \"{text}\"\nReply in a natural, short, and conversational tone. Keep it to 1–2 sentences."
     )
     await chat_with_agent(main_agent, main_prompt, responses, log=log)
 

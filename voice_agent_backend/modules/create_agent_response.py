@@ -14,8 +14,8 @@ async def chat_with_agent(agent, prompt, responses, log=None):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": agent["system_prompt"]},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": f"Act as {agent['name']}({agent['role']}): {agent['description']}. {prompt}"},
+                {"role": "user", "content": f"This is the conversation history so far: {log}." }
             ]
         )
         
