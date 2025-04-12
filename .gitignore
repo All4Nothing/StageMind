@@ -25,3 +25,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python
+__pycache__
+venv/
+voice_agent_backend/sessions/*
+.DS_Store
