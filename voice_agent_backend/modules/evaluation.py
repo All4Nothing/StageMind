@@ -56,36 +56,3 @@ def send_to_perplexity(messages, max_tokens=1000):
         logger.error(f"Exception during API call: {str(e)}")
         return {"error": f"Exception: {str(e)}"}
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the AI communication analysis API!"}
-
-@app.get("/analyze")
-def analyze():
-    full_text = """
-    User info:
-    User is a university student learning AI ethics. Their goal is to improve persuasive communication.
-
-    Experts:
-    - Expert 1: AI ethicist with a focus on fairness.
-    - Expert 2: ML researcher exploring bias in data.
-    - Expert 3: Tech policy analyst focused on regulation.
-
-    Knowledge Base:
-    The discussion centers around ethical AI, data bias, transparency, explainability, and responsible deployment of LLMs.
-
-    Conversation:
-    User: I believe AI can be unbiased if we train it well.
-    Expert 1: That’s a good start, but fairness is also about how outcomes impact people differently.
-    User: Isn’t that mostly a problem with bad code?
-    Expert 2: It’s also about how the data is collected and who it represents.
-    User: Hmm… I hadn’t considered that.
-    """
-
-    result = send_to_perplexity(full_text)
-    
-    # Return result as JSON response
-    if "error" in result:
-        return JSONResponse(status_code=500, content=result)
-    
-    return JSONResponse(content=result)

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Body, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any
@@ -7,6 +7,8 @@ import asyncio
 from modules.record_audio import record_audio_chunk
 from modules.speech_to_text import transcribe_audio
 from modules.handles_conversation import handle_conversation
+from modules.evaluation import send_to_perplexity
+from fastapi.responses import JSONResponse
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -112,6 +114,36 @@ async def process_speech_endpoint(request: ChatRequest = Body(...)):
     
     # This endpoint is deprecated, clients should use the WebSocket endpoint
     return {"status": "deprecated", "message": "Please use the WebSocket endpoint /ws/chat for real-time communication"}
+
+@app.get("/analyze")
+def analyze(request:Request):
+    data = request.json()
+    scenario = data.get("scenario", "")
+    agents = data.get("AGENTS", [])
+    knowledge = data.get("knowledge", "")
+        
+
+    full_text = f"""
+    scenario info:
+    {scenario}
+
+    Experts:
+    {agents}
+
+    Knowledge Base:
+    {knowledge}
+
+    Conversation:
+    {}
+    """
+
+    result = send_to_perplexity(full_text)
+
+    # Return result as JSON response
+    if "error" in result:
+        return JSONResponse(status_code=500, content=result)
+    
+    return JSONResponse(content=result)
 
 # Run the FastAPI app with uvicorn when this file is executed directly
 if __name__ == "__main__":
