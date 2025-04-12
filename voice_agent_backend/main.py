@@ -116,7 +116,7 @@ async def process_speech_endpoint(
     
     # Transcribe audio to text
     try:
-        user_text = transcribe_audio(audio)
+        user_text = await transcribe_audio(audio)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to transcribe audio: {str(e)}")
     
