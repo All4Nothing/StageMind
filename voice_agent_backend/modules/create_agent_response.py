@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from faster_whisper import WhisperModel
 from openai import OpenAI
 
-# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path="/Users/jason/StageMind/.env.local")
+dotenv_path = os.path.join(os.getcwd(), '.env.local')
+load_dotenv(dotenv_path=dotenv_path)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -19,11 +19,10 @@ async def chat_with_agent(agent, prompt, responses, log=None):
             ]
         )
         
-        # print(f"response: {response}")
         reply = response.choices[0].message.content.strip()
         if log is not None:
             log.append({"speaker": agent['name'], "text": reply})
-        # print(f"reply: {reply}")
+            
     except Exception as e:
         print(f"❌ Error from {agent['name']}: {e}")
         reply = "Sorry, I couldn't generate a response."

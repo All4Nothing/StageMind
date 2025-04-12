@@ -7,8 +7,8 @@ import json
 
 # import pyttsx3
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path="/Users/jason/StageMind/.env.local")
+dotenv_path = os.path.join(os.getcwd(), '.env.local')
+load_dotenv(dotenv_path=dotenv_path)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -37,6 +37,7 @@ def speak(text, voice="nova"):
                 voice=voice,
                 input=text
             )
+            
             response.stream_to_file(tmp.name)
         print(f"[{voice}] says: {text}")
         pygame.mixer.init()

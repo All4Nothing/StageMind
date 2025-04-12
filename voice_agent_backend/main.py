@@ -47,14 +47,14 @@ async def websocket_chat_endpoint(websocket: WebSocket):
         knowledge = config.get("knowledge", "")
         
         # Initialize conversation context
+        VOICE_MAP = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
         routing_prompt = "You're a router.:\n"
-        for agent in AGENTS:
+        for idx, agent in enumerate(AGENTS):
             agent_name = agent["name"]
             agent_role = agent["role"]
             agent_description = agent["description"]
+            agent["voice"] = VOICE_MAP[idx]
             routing_prompt += f"- {agent_name}({agent_role}): {agent_description}\n"
-
-            agent["voice"] = "ash"
         
         conversation_log = []
         
@@ -74,15 +74,15 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 pass
             
             # Record audio and process
-            audio_path = record_audio_chunk(duration=10)
-            user_input = transcribe_audio(audio_path)
+            audio_path = record_audio_chunk(max_duration=10, silence_duration=2.0)
+            user_input, arousal, dominance = transcribe_audio(audio_path)
             
             if user_input:
                 # Send transcription to client
                 await websocket.send_json({"status": "transcription", "text": user_input})
                 
                 # Add to conversation log
-                conversation_log.append({"speaker": "User", "text": user_input})
+                conversation_log.append({"speaker": "User", "text": user_input, "arousal": arousal, "dominance": dominance})
                 
                 # Send updated conversation log to frontend
                 await websocket.send_json({
@@ -103,6 +103,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                     "message": "Response processed",
                     "conversation_log": conversation_log
                 })
+            print(f"conversation log: {conversation_log}")
     
     except WebSocketDisconnect:
         print("Client disconnected")

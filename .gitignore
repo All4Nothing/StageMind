@@ -60,6 +60,8 @@ next-env.d.ts
 
 # python
 __pycache__
+.venv/
 venv/
 voice_agent_backend/sessions/*
 .DS_Store
+wav2vec2_checkpoints/
