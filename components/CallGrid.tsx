@@ -11,6 +11,7 @@ export function CallGrid({
   }) {
     return (
       <div className="flex-grow p-4 relative">
+        
         {/* Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-10 -left-10 w-64 h-64 rounded-full bg-teal-500/10 blur-3xl"></div>
@@ -19,6 +20,7 @@ export function CallGrid({
         </div>
   
         <div className="grid grid-cols-2 gap-4 max-w-5xl mx-auto relative z-10">
+          
           <CallParticipant name="You" isUser={true} bgColor="bg-gray-800" micOn={micOn} videoOn={videoOn} />
   
           {scenarioData && scenarioData.participants ? (

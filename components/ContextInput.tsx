@@ -20,7 +20,7 @@ export function ContextInput({
 }) {
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
-      <h2 className="text-xl font-semibold mb-4 text-white">Context</h2>
+      <h2 className="text-xl font-semibold mb-4 text-white text-center">Context</h2>
 
       <Textarea
         className="w-full h-32 bg-gray-900/70 border-gray-700 text-white mb-6 rounded-xl resize-none"
