@@ -330,11 +330,13 @@ export default function Home() {
                       className="w-full bg-teal-500 hover:bg-teal-600 text-white py-4 rounded-xl mt-4"
                       onClick={() => {
                         console.log('Navigating to call page with WebSocket support...');
+                        console.log('Including knowledge in scenario data:', aiResponse.knowledge);
                         // Navigate directly to the call page - WebSocket connection will be established there
                         window.location.href = `/call?scenario=${encodeURIComponent(JSON.stringify({
                           scenario: aiResponse.scenario,
                           participants: aiResponse.participants,
-                          meetingLength: duration
+                          meetingLength: duration,
+                          knowledge: aiResponse.knowledge
                         }))}`;
                       }}
                     >

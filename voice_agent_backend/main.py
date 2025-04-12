@@ -70,7 +70,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 pass
             
             # Record audio and process
-            audio_path = record_audio_chunk(duration=5)
+            audio_path = record_audio_chunk(max_duration=10, silence_duration=2.0)
             user_input = transcribe_audio(audio_path)
             
             if user_input:
@@ -115,13 +115,14 @@ async def process_speech_endpoint(request: ChatRequest = Body(...)):
     # This endpoint is deprecated, clients should use the WebSocket endpoint
     return {"status": "deprecated", "message": "Please use the WebSocket endpoint /ws/chat for real-time communication"}
 
-@app.get("/analyze")
-def analyze(request:Request):
-    data = request.json()
+@app.post("/analyze")
+async def analyze(request:Request):
+    data = await request.json()
     scenario = data.get("scenario", "")
     agents = data.get("AGENTS", [])
     knowledge = data.get("knowledge", "")
-        
+    conversation = data.get("conversation", [])
+
 
     full_text = f"""
     scenario info:
@@ -134,7 +135,7 @@ def analyze(request:Request):
     {knowledge}
 
     Conversation:
-    {}
+    {conversation}
     """
 
     result = send_to_perplexity(full_text)

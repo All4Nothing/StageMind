@@ -24,6 +24,7 @@ export default function CallPage() {
       description: string;
     }>;
     meetingLength: number;
+    knowledge?: string;
   } | null>(null)
   
   const searchParams = useSearchParams()
@@ -66,7 +67,7 @@ export default function CallPage() {
       const config = {
         scenario: data.scenario,
         AGENTS: data.participants,
-        knowledge: ''
+        knowledge: data.knowledge || ''
       }
       ws.send(JSON.stringify(config))
     }
@@ -100,7 +101,7 @@ export default function CallPage() {
     setWebSocket(ws)
   }
 
-  const handleEndCall = () => {
+  const handleEndCall = async () => {
     const mediaTracks = ['video', 'audio']
     mediaTracks.forEach(async (type) => {
       try {
@@ -119,6 +120,36 @@ export default function CallPage() {
     // Close WebSocket connection
     if (webSocket) {
       webSocket.close()
+    }
+    
+    // Send data to the analyze endpoint
+    if (scenarioData) {
+      try {
+        console.log('Sending data to analyze endpoint...')
+        const response = await fetch('http://localhost:8000/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            scenario: scenarioData.scenario,
+            AGENTS: scenarioData.participants,
+            knowledge: scenarioData.knowledge || '',
+            conversation: messages
+          }),
+        })
+        
+        if (response.ok) {
+          const analysisResult = await response.json()
+          console.log('Analysis result:', analysisResult)
+          // Store analysis result in state if needed
+          // setAnalysisResult(analysisResult)
+        } else {
+          console.error('Failed to get analysis:', response.statusText)
+        }
+      } catch (error) {
+        console.error('Error sending data to analyze endpoint:', error)
+      }
     }
   
     setCallEnded(true)
