@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Mic, MicOff, VideoOff } from "lucide-react"
-import MyCamera from "./mycamera"
+import MyCamera from "./MyCamera"
 import MyMicRecorder from "./myMicRecorder"
 
 interface CallParticipantProps {

@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react"
 import { Mic, MicOff, Video, VideoOff, Monitor, Smile, Settings, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/ThemeProvider"
 import Link from "next/link"
 import Image from "next/image"
-import CallParticipant from "@/components/call-participant"
+import CallParticipant from "@/components/CallParticipants"
 import { useSearchParams } from "next/navigation"
 
 export default function CallPage() {
