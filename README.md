@@ -3,6 +3,9 @@
 - Like a **flight simulator**, but for **communication and soft skills**.
 - Designed to help users improve their communication skills through dynamic role-playing scenarios.
 - Afterward, the platform gives you **feedback** on how you did.
+
+![Uploading video2992343111.gif…]()
+
 ---
 ### 🛠️ Built With
 * ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)  
