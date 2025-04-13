@@ -4,7 +4,7 @@
 - Designed to help users improve their communication skills through dynamic role-playing scenarios.
 - Afterward, the platform gives you **feedback** on how you did.
 
-![Uploading video2992343111.gif…]()
+https://github.com/user-attachments/assets/b820904e-d1d2-4fba-82f4-0ec5267e7988
 
 ---
 ### 🛠️ Built With
