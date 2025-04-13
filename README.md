@@ -94,7 +94,7 @@ https://github.com/user-attachments/assets/8b85b2ae-bd74-4fe0-94be-ea27191dee0b
    ```sh
    npm run dev
    ```
-3. Open your browser at: :오른쪽을_가리키는_손_모양: http://localhost:3000
+3. Open your browser at:  http://localhost:3000
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### 👥 Authors
