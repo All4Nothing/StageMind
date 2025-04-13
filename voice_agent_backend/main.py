@@ -74,7 +74,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 pass
             
             # Record audio and process
-            audio_path = record_audio_chunk(max_duration=10, silence_duration=2.0)
+            audio_path = record_audio_chunk(duration=10, silence_duration=2.0)
             user_input, arousal, dominance = transcribe_audio(audio_path)
             
             if user_input:

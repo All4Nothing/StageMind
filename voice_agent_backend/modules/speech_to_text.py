@@ -11,7 +11,7 @@ from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
 
 from pydub import AudioSegment
 
-dotenv_path = os.path.join(os.getcwd(), '.env.local')
+dotenv_path = os.path.join("..", '.env.local')
 load_dotenv(dotenv_path=dotenv_path)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))

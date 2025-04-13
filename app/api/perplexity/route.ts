@@ -31,13 +31,15 @@ export async function POST(request: Request) {
       { 
         role: "user", 
         content: `Based on the following meeting scenario: ${scenarioText}
-Please perform these three tasks:
+Please perform these four tasks:
 1. Write a short paragraph summarizing the scenario to display in the 'Overview' section.
-2. Generate detailed profiles for ${participants} participants who would be appropriate for this scenario, including their name, role, and a brief description.
-3. Gather relevant knowledge about the topic of the scenario that would be helpful for the meeting (this won't be displayed directly but will be used in the background).
+2. Extract or create a clear, concise goal statement that represents what the user wants to achieve in this scenario. This should be from the user's perspective.
+3. Generate detailed profiles for ${participants} participants who would be appropriate for this scenario, including their name, role, and a brief description.
+4. Gather relevant knowledge about the topic of the scenario that would be helpful for the meeting (this won't be displayed directly but will be used in the background).
 
 Format your response as a JSON object with these fields:
 - scenario: A concise paragraph describing the meeting context
+- goal: A clear statement of what the user wants to achieve in this scenario
 - participants: An array of objects, each with name, role, and description fields
 - knowledge: Comprehensive background information about the topic (not for display)` 
       }
@@ -69,6 +71,7 @@ Format your response as a JSON object with these fields:
               type: "object",
               properties: {
                 scenario: { type: "string" },
+                goal: { type: "string" },
                 participants: {
                   type: "array",
                   items: {
@@ -83,7 +86,7 @@ Format your response as a JSON object with these fields:
                 },
                 knowledge: { type: "string" }
               },
-              required: ["scenario", "participants", "knowledge"]
+              required: ["scenario", "goal", "participants", "knowledge"]
             }
           }
         }

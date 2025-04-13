@@ -1,15 +1,14 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Mic, MicOff, Video, VideoOff, Monitor, Smile, Settings, MessageSquare } from "lucide-react"
+import { Mic, MicOff, Video, VideoOff, Monitor, Smile, Settings, MessageSquare, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeProvider } from "@/components/theme-provider"
 import Link from "next/link"
 import Image from "next/image"
 import CallParticipant from "@/components/call-participant"
 import { useSearchParams } from "next/navigation"
-import { Header } from "@/components/header"
 
-export default function CallPage() {
+export default function ConversationPage() {
   const [callEnded, setCallEnded] = useState(false)
   const [micOn, setMicOn] = useState(true)
   const [videoOn, setVideoOn] = useState(true)
@@ -18,17 +17,18 @@ export default function CallPage() {
   const [messages, setMessages] = useState<Array<{speaker: string, text: string}>>([])  
   const [conversationLog, setConversationLog] = useState<Array<{speaker: string, text: string}>>([])  
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
-  const [analysisResult, setAnalysisResult] = useState<any>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<any>(null)
   const [scenarioData, setScenarioData] = useState<{
     scenario: string;
+    goal: string;
     participants: Array<{
       name: string;
       role: string;
       description: string;
     }>;
-    meetingLength: number;
     knowledge?: string;
+    meetingLength?: number;
   } | null>(null)
   
   const searchParams = useSearchParams()
@@ -70,6 +70,7 @@ export default function CallPage() {
       // Send initial configuration to the server
       const config = {
         scenario: data.scenario,
+        goal: data.goal,
         AGENTS: data.participants,
         knowledge: data.knowledge || ''
       }
@@ -112,6 +113,7 @@ export default function CallPage() {
   }
 
   const handleEndCall = async () => {
+    // Stop all media tracks (audio and video)
     const mediaTracks = ['video', 'audio']
     mediaTracks.forEach(async (type) => {
       try {
@@ -175,22 +177,21 @@ export default function CallPage() {
       setIsAnalyzing(false)
     }
   }
-  
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vibe-theme">
-      <main className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 p-4">
-        <Header />
+      <main className="flex min-h-screen flex-col bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900">
         {!callEnded ? (
           <>
             {/* Call Header */}
             <div className="w-full bg-gray-900/80 backdrop-blur-sm p-3 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <span className="text-white font-semibold">SimuMeet</span>
-                <span className="text-gray-400 text-sm">{scenarioData ? 'Custom Scenario' : 'Job Interview Simulation'}</span>
+                <span className="text-white font-semibold">StageMind</span>
+                {/* <span className="text-gray-400 text-sm">{scenarioData ? 'Custom Scenario' : 'Job Interview Simulation'}</span> */}
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400 text-sm">Duration: {scenarioData ? `${scenarioData.meetingLength}:00` : '00:05:32'}</span>
-              </div>
+              {/* <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-sm">Duration: {scenarioData?.meetingLength ? `${scenarioData.meetingLength}:00` : '00:05:32'}</span>
+              </div> */}
             </div>
 
             {/* Call Grid */}
@@ -203,13 +204,13 @@ export default function CallPage() {
               </div>
               
               {/* Transcription display */}
-              <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700 max-w-5xl mx-auto">
+              {/* <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700 max-w-5xl mx-auto">
                 <h3 className="text-gray-300 text-sm mb-2">Current Transcription:</h3>
                 <p className="text-white">{transcript || 'Listening...'}</p>
-              </div>
+              </div> */}
               
               {/* Conversation history */}
-              <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700 max-w-5xl mx-auto overflow-y-auto max-h-40">
+              {/* <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700 max-w-5xl mx-auto overflow-y-auto max-h-40">
                 <h3 className="text-gray-300 text-sm mb-2">Conversation:</h3>
                 {messages.map((msg, index) => (
                   <div key={index} className="mb-2">
@@ -218,7 +219,7 @@ export default function CallPage() {
                   </div>
                 ))}
                 {messages.length === 0 && <p className="text-gray-400 italic">The conversation will appear here...</p>}
-              </div>
+              </div> */}
 
               <div className="grid grid-cols-2 gap-4 max-w-5xl mx-auto relative z-10">
                 <CallParticipant name="You" isUser={true} bgColor="bg-gray-800" micOn={micOn} videoOn={videoOn} />
@@ -339,7 +340,7 @@ export default function CallPage() {
           <div className="flex-grow flex flex-col items-center justify-center p-6">
             <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700 max-w-3xl w-full">
               <h2 className="text-2xl font-bold text-white mb-6 text-center">Simulation Feedback</h2>
-
+              
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-white mb-4">Performance Score</h3>
                 <div className="flex justify-between items-center mb-6">
@@ -367,10 +368,10 @@ export default function CallPage() {
                 <h3 className="text-xl font-semibold text-white mb-4">Feedback Summary</h3>
                 <div className="bg-gray-900/70 p-4 rounded-lg border border-gray-700 mb-4">
                   <p className="text-gray-300 mb-2">
-                    <span className="font-semibold text-teal-400">Strengths:</span> {analysisResult?.strengths || "You demonstrated strong communication skills and provided clear examples from your past experience. Your answers were well-structured and concise."}
+                    <span className="font-semibold text-teal-400">Strengths:</span> {analysisResult.strengths || "You demonstrated strong communication skills and provided clear examples from your past experience. Your answers were well-structured and concise."}
                   </p>
                   <p className="text-gray-300">
-                    <span className="font-semibold text-teal-400">Areas for improvement:</span> {analysisResult?.weaknesses || "Consider providing more specific technical details when answering questions about your skills. Practice explaining complex concepts in simpler terms."}
+                    <span className="font-semibold text-teal-400">Areas for improvement:</span> {analysisResult.weaknesses || "Consider providing more specific technical details when answering questions about your skills. Practice explaining complex concepts in simpler terms."}
                   </p>
                 </div>
               </div>
@@ -406,7 +407,7 @@ export default function CallPage() {
                       );
                     })
                   ) : (
-                    // Fallback to default feedback cards
+                    // Default feedback cards
                     <>
                       <FeedbackCard
                         name="Alex Chen"
