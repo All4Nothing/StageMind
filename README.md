@@ -16,6 +16,10 @@ https://github.com/user-attachments/assets/8b85b2ae-bd74-4fe0-94be-ea27191dee0b
 * ![Hugging Face](https://img.shields.io/badge/HuggingFace-FFD21F?style=for-the-badge&logo=huggingface&logoColor=black)  
 * ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)   
 * ![Perplexity API](https://img.shields.io/badge/Perplexity%20API-000000?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjRkZGIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMu%0D%0Ab3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI4IiBjeT0iOCIgcj0iOCI+PC9jaXJjbGU+PC9zdmc+)  
+---  
+### ⭐️ Project Architecture
+![Group 7](https://github.com/user-attachments/assets/d2f6e99d-35f7-4859-ac3c-9c8e5f30adeb)
+
 ---
 ### 💡 **Why It Matters**
 - Most people don’t get to **practice communication safely**.
