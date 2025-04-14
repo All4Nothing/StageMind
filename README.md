@@ -72,7 +72,7 @@ https://github.com/user-attachments/assets/8b85b2ae-bd74-4fe0-94be-ea27191dee0b
    ```sh
    git clone https://github.com/All4Nothing/StageMind
    ```
-2. Create `.env.local` file in the directory in which `package.json` exists and paste the following:
+2. Create `.env` file in the directory in which `package.json` exists and paste the following:
    ```js
    PERPLEXITY_API_KEY=<your_own_API_KEY>
    OPENAI_API_KEY = <your_own_API_KEY>
