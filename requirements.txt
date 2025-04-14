@@ -11,3 +11,5 @@ torch
 torchaudio
 transformers
 webrtcvad
+pydub
+ffmpeg

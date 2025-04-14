@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 from .create_agent_response import chat_with_agent
 from .text_to_speech import speak
 
-dotenv_path = os.path.join("..", '.env.local')
-load_dotenv(dotenv_path=dotenv_path)
+base_dir = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(base_dir, "..", "..", ".env") 
+load_dotenv(dotenv_path=env_path)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # client = OpenAI(api_key=os.getenv("PERPLEXITY_API_KEY"), base_url="https://api.perplexity.ai")
