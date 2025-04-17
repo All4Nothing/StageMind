@@ -1,9 +1,13 @@
 # 🧠 StageMind: AI-Powered Communication Training Tool
 - **StageMind** is an AI-based platform designed to help users practice and improve their communication skills through realistic, scenario-based simulations.
+<img width="500" alt="Screenshot 2025-04-17 at 1 43 33 PM" src="https://github.com/user-attachments/assets/85fc2131-466b-412b-846c-f9c970a25ce6" />
+<img width="500" alt="Screenshot 2025-04-17 at 1 43 52 PM" src="https://github.com/user-attachments/assets/431e5b3b-e583-4957-a167-d45396e1a77a" />
+<img width="500" alt="Screenshot 2025-04-17 at 1 44 03 PM" src="https://github.com/user-attachments/assets/a67efb10-5b38-42ac-9d37-01428fb78c8d" />
+<img width="300" alt="Screenshot 2025-04-17 at 1 59 02 PM" src="https://github.com/user-attachments/assets/c54bf1c7-ccb1-4f07-adc7-7fc7585331db" />
 
-https://github.com/user-attachments/assets/8b85b2ae-bd74-4fe0-94be-ea27191dee0b
 ---  
 ### Project Architecture  
+![Group 7](https://github.com/user-attachments/assets/f92f2adf-ca3b-42f2-a719-78383ac23f8e)
 
 ---
 ### 🛠️ Built With
