@@ -60,7 +60,7 @@ Rehearse presentation scenarios with audience-like AI agents and receive feedbac
 ### 🖥️ Frontend
 1. Install NPM packages
    ```sh
-   pnpm install
+   npm install
    ```
 2. Start the development server
    ```sh
