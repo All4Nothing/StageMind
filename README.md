@@ -38,8 +38,8 @@ Simulate difficult conversations, such as resolving conflicts or giving construc
 - **Public Speaking & Presentation**  
 Rehearse presentation scenarios with audience-like AI agents and receive feedback on clarity, emotion, and tone.
 
-### ⚙️ Installation
-#### 🔙 Backend
+### Installation
+#### Backend
 1. Clone the repo
    ```sh
    git clone https://github.com/All4Nothing/StageMind
@@ -57,7 +57,7 @@ Rehearse presentation scenarios with audience-like AI agents and receive feedbac
    ```sh
    python main.py
    ```
-### 🖥️ Frontend
+### Frontend
 1. Install NPM packages
    ```sh
    npm install
@@ -69,7 +69,7 @@ Rehearse presentation scenarios with audience-like AI agents and receive feedbac
 3. Open your browser at:  http://localhost:3000/practice
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### 👥 Authors
+### Authors
 <p align="left">
   -Yongjoo Kim : AI Engineering
 <a href="https://www.linkedin.com/in/yongjoo-kim/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="lauragrandaf" height="20" width="20" /></a>
