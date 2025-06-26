@@ -1,4 +1,4 @@
-# 🧠 StageMind: AI-Powered Communication Training Tool
+# StageMind: AI-Powered Communication Training Tool
 - **StageMind** is an AI-based platform designed to help users practice and improve their communication skills through realistic, scenario-based simulations.
 <img width="500" alt="Screenshot 2025-04-17 at 1 43 33 PM" src="https://github.com/user-attachments/assets/85fc2131-466b-412b-846c-f9c970a25ce6" />
 <img width="500" alt="Screenshot 2025-04-17 at 1 43 52 PM" src="https://github.com/user-attachments/assets/431e5b3b-e583-4957-a167-d45396e1a77a" />
